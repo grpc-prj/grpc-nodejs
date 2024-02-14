@@ -13,14 +13,14 @@ var packageDefinition = protoLoader.loadSync(PROTO_PATH, options);
 const newsProto = grpc.loadPackageDefinition(packageDefinition);
 
 const server = new grpc.Server();
-const news = [
+let news = [
   { id: "1", title: "Note 1", body: "Content 1", postImage: "Post image 1" },
   { id: "2", title: "Note 2", body: "Content 2", postImage: "Post image 2" },
 ];
 
 server.addService(newsProto.NewsService.service, {
   getAllNews: (_, callback) => {
-    callback(null, news);
+    callback(null, { news: news });
   },
   getNews: (_, callback) => {
     const newsId = _.request.id;
@@ -41,7 +41,7 @@ server.addService(newsProto.NewsService.service, {
     callback(null, newsItem);
   },
   addNews: (call, callback) => {
-    let _news = { id: Date.now(), ...call.request };
+    let _news = Object.assign(call.request, { id: Date.now() })
     news.push(_news);
     callback(null, _news);
   },
